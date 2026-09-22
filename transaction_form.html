@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}{% if transaction %}Редактировать{% else %}Добавить{% endif %} транзакцию{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-body p-4">
+                <h2 class="mb-4">{% if transaction %}Редактировать{% else %}Добавить{% endif %} транзакцию</h2>
+                <form method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Тип</label>
+                        <select name="type" class="form-select" required>
+                            <option value="expense" {% if transaction and transaction.type == 'expense' %}selected{% endif %}>Расход</option>
+                            <option value="income" {% if transaction and transaction.type == 'income' %}selected{% endif %}>Доход</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Сумма (₽)</label>
+                        <input type="number" step="0.01" min="0.01" name="amount" class="form-control" required
+                               value="{{ transaction.amount if transaction else '' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Категория</label>
+                        <select name="category_id" class="form-select">
+                            <option value="">— без категории —</option>
+                            {% for c in categories %}
+                            <option value="{{ c.id }}"
+                                {% if transaction and transaction.category_id == c.id %}selected{% endif %}>
+                                {{ c.name }} ({{ 'доход' if c.type == 'income' else 'расход' }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Дата</label>
+                        <input type="date" name="date" class="form-control" required
+                               value="{{ transaction.date.isoformat() if transaction else '' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Описание</label>
+                        <textarea name="description" class="form-control" rows="2">{{ transaction.description if transaction else '' }}</textarea>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Сохранить</button>
+                        <a href="{{ url_for('main.transactions_list') }}" class="btn btn-outline-secondary">Отмена</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+// Set today's date if empty
+document.addEventListener('DOMContentLoaded', function() {
+    const dateInput = document.querySelector('input[name="date"]');
+    if (dateInput && !dateInput.value) {
+        dateInput.value = new Date().toISOString().slice(0, 10);
+    }
+});
+</script>
+{% endblock %}

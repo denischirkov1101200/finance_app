@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Категории — Учёт финансов{% endblock %}
+{% block content %}
+<h1 class="mb-4">Категории</h1>
+
+<div class="row">
+    <div class="col-md-5 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header">Добавить категорию</div>
+            <div class="card-body">
+                <form method="post" action="{{ url_for('main.category_add') }}">
+                    <div class="mb-3">
+                        <label class="form-label">Название</label>
+                        <input type="text" name="name" class="form-control" required maxlength="80">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Тип</label>
+                        <select name="type" class="form-select">
+                            <option value="expense">Расход</option>
+                            <option value="income">Доход</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Добавить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-7">
+        <div class="card shadow-sm">
+            <div class="card-header">Список категорий</div>
+            <ul class="list-group list-group-flush">
+                {% for c in categories %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>
+                        {{ c.name }}
+                        <span class="badge {% if c.type == 'income' %}text-bg-success{% else %}text-bg-danger{% endif %} ms-2">
+                            {{ 'доход' if c.type == 'income' else 'расход' }}
+                        </span>
+                    </span>
+                    <form method="post" action="{{ url_for('main.category_delete', cid=c.id) }}"
+                          onsubmit="return confirm('Удалить категорию? Транзакции останутся без категории.');">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Удалить</button>
+                    </form>
+                </li>
+                {% else %}
+                <li class="list-group-item text-muted">Нет категорий</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
